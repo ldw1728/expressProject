@@ -4,6 +4,8 @@ const winstonDaily = require('winston-daily-rotate-file') ;
 const logDir = 'logs' //로그파일 저장할 디렉토리
 const { combine, timestamp, printf} = winston.format;
 
+//// winston log 설정.
+  
 //define log format
 const logFormat = printf(info=>{
     return `${info.timestamp} ${info.level}: ${info.message}`;
@@ -31,6 +33,16 @@ const logger = winston.createLogger({
             zippedArchive: true,
         }),
 
+        //http 
+        new winstonDaily({
+            level:'http', 
+            datePattern: 'YYYY-MM-DD',
+            dirname: logDir + '/req',
+            filename: `%DATE%.req.log`, 
+            maxFiles: 30,   //30일치 로그 파일 저장
+            zippedArchive: true,
+        }),
+
         //error 레벨 로그 파일 설정
         new winstonDaily({
             level: 'error',
@@ -44,6 +56,12 @@ const logger = winston.createLogger({
 });
 
 
+ const stream = {// morgan wiston 설정
+    write: message => {
+        logger.http(message);
+    }
+} 
+
 //prod 환경이 아닌경우
 if(process.env.NODE_ENV !== 'production'){
     logger.add(new winston.transports.Console({
@@ -54,4 +72,13 @@ if(process.env.NODE_ENV !== 'production'){
     }));
 }
 
-module.exports = logger;
+//전역객체 설정.
+global.logger = logger;
+
+
+ //// morgan log 설정
+var morgan = require('morgan');
+var env = prop.getEnv() === 'production' ? 'combined' : 'dev';
+morgan = morgan(env, {stream});
+
+module.exports = morgan;

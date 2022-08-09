@@ -6,3 +6,8 @@ exports.getPort = () => {
     let port = properties.get('server.port');
     return port;
 }
+
+exports.getEnv = () => {
+    let env = properties.get('env.NODE_ENV');
+    return env;
+}

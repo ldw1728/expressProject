@@ -1,20 +1,35 @@
+
+//global val
+global.prop = require('./common/properties');
+
 //lib
 const express = require('express');
-const prop = require('./common/properties');
-const homerouter = require('./routes/home');
-const logger = require('./config/winston');
+const baseRouter = require('./routes/BaseRouter');
+const homerouter = require('./routes/Home');
+
+const morgan = require('./config/logger');
 
 //variables definition 
 const port = prop.getPort();    // - port
 const app = express();          // - def express app
 
 //accept middleware
-app.use(homerouter);
+app.use(morgan);
+app.use(baseRouter);
+app.use(homerouter); 
 
-app.get('/error', function(req, res){
-    res.sendStatus(500);
-    logger.error('500 error');
+
+
+//**** 에러처리 정의하세요 */
+app.use(function(err, req, res, next){
+   
+        console.log(err.stack)
+        logger.error(err.stack);
+        res.redirect('/');
+    
+    
 })
+
 
 //server start
 app.listen(port, ()=>{
