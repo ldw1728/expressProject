@@ -18,7 +18,15 @@ app.use(morgan);
 app.use(baseRouter);
 app.use(homerouter); 
 
+app.use('/error', function(req, res, next){
+    res.sendStatus(500);
+    
+})
 
+//404 error 
+app.use(function(req, res, next){
+    next(err);
+})
 
 //**** 에러처리 정의하세요 */
 app.use(function(err, req, res, next){
@@ -26,8 +34,7 @@ app.use(function(err, req, res, next){
         console.log(err.stack)
         logger.error(err.stack);
         res.redirect('/');
-    
-    
+
 })
 
 
