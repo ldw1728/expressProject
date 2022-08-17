@@ -5,9 +5,5 @@ router.all('/*',(req, res, next) => {
     next();
 });
 
-router.all('/',(req, res, next) => {
-    res.send('index');
-});
-
 
 module.exports = router;
