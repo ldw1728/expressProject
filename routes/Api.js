@@ -22,8 +22,16 @@ module.exports = function(app, Data){
     });
 
     //read
-    app.get('/api/data', function(req, res, next){
-        res.end();
+    app.get('/api/data', function(req, res){
+            Data.find(function(err, datas){
+                if(err){
+                    logger.error(err);
+                    res.status(500).send({error:'database failure'});
+                    return;
+                }
+
+                res.json(datas);
+            })
     });
 }
 
