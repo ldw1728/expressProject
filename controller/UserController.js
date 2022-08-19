@@ -4,7 +4,7 @@ const userService = require('../service/AuthService')(User);
 exports.createUser = async(req, res, next) => {
     try{
         const { email } = req.body; //분해할당하여 email변수지정
-        const user = User.findOne(email);
+        const user = await User.findOne({email});
         if(user){
             let error = new Error('email 중복');
             error.statusCode = 404;
@@ -14,5 +14,6 @@ exports.createUser = async(req, res, next) => {
         res.status(201).json({message : 'user created.'}); 
     }catch(err){
         next(err);
+        
     }
 }

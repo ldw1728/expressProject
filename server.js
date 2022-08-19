@@ -3,7 +3,7 @@
 global.prop = require('./common/properties');
 
 //load pakage
-const express = require('express');
+
 const bodyparser = require('body-parser');
 const mongoose = require('mongoose');
 const baseRouter = require('./routes/BaseRouter');
@@ -14,7 +14,7 @@ const morgan = require('./config/logger');
 
 //variables definition 
 const port = prop.getPort();    // - port
-const app = express();          // - def express app
+
 
 //// -- accept middleware
 // -- logger
@@ -70,4 +70,4 @@ app.listen(port, ()=>{
 
 
 
-// 현재 회원등록 단계까지 작성함.
+// 라우터관련 프로젝트 구성중.......
