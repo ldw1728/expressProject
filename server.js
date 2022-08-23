@@ -1,27 +1,10 @@
 
-//global val
-global.prop = require('./common/properties');
+const app = require('./app');
 
-//load pakage
-
-const bodyparser = require('body-parser');
 const mongoose = require('mongoose');
-const baseRouter = require('./routes/BaseRouter');
-const homerouter = require('./routes/Home');
-const userRouter = require('./routes/UserRouter');
-
-const morgan = require('./config/logger');
 
 //variables definition 
 const port = prop.getPort();    // - port
-
-
-//// -- accept middleware
-// -- logger
-app.use(morgan);
-//-- body-parser
-app.use(bodyparser.urlencoded({extended : true}));
-app.use(bodyparser.json());
 
 // -- configure mongo
 var db = mongoose.connection;
@@ -32,42 +15,7 @@ db.once('open', function(){
 
 mongoose.connect('mongodb://localhost/mongo_tuto');
 
-var Data = require('./models/data');
-
-// -- router 
-app.use(baseRouter);
-app.use(homerouter); 
-app.use(userRouter);
-
-//라우터 모듈의 확장성을 고려한 설계가 필요
-
-//const apirouter = require('./routes/Api.js')(app, Data);
-
-app.use('/error', function(req, res, next){
-    res.sendStatus(500);
-    
-})
-
-//404 error 
-app.use(function(req, res, next){
-    next(err);
-})
-
-//**** 에러처리 정의하세요 */
-app.use(function(err, req, res, next){
-   
-        console.log(err.stack)
-        logger.error(err.stack);
-        res.redirect('/');
-
-})
-
-
 //server start
 app.listen(port, ()=>{
     logger.info(`Server listening on port ${port}`);
 }) 
-
-
-
-// 라우터관련 프로젝트 구성중.......
