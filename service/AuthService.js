@@ -28,7 +28,7 @@ module.exports = (User) => { //function의 매개변수를이용한 의존성 �
 
     //userId token 생성
     userService.createToken = (userId) => {
-        const token = jwt.sign({_id: userId.toString()}, bcrypt.genSalt().toString());
+        const token = jwt.sign({_id: userId.toString()}, bcrypt.genSalt().toString(), {expiresIn:'10m'});
         return token;
     }
 

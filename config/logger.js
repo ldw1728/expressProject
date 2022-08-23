@@ -5,6 +5,21 @@ const logDir = 'logs' //로그파일 저장할 디렉토리
 const { combine, timestamp, printf} = winston.format;
 
 //// winston log 설정.
+
+const custom_level = {
+    levels: {
+        error : 0,
+        login: 1,
+        info: 2,
+        http: 3,
+        verbose: 4,
+        debug: 5,
+        silly: 6,
+    },
+    colors: {
+        login: 'yellow'
+    }
+}
   
 //define log format
 const logFormat = printf(info=>{
@@ -15,6 +30,7 @@ const logFormat = printf(info=>{
  * Log Level
  * error: 0, warn: 1, info: 2, http: 3, verbose: 4, debug: 5, silly: 6
  */
+winston.addColors(custom_level.colors);
 const logger = winston.createLogger({
     format: combine(
         timestamp({
@@ -22,6 +38,7 @@ const logger = winston.createLogger({
         }),
         logFormat,
     ),
+    levels: custom_level.levels,
     transports: [
         //info 
         new winstonDaily({
@@ -49,6 +66,16 @@ const logger = winston.createLogger({
             datePattern: 'YYYY-MM-DD',
             dirname: logDir + '/error',
             filename: `%DATE%.error.log`,
+            maxFile: 30,
+            zippedArchive: true,
+        }),
+
+        //login 레벨 로그 파일 설정
+        new winstonDaily({
+            level: 'login',
+            datePattern: 'YYYY-MM-DD',
+            dirname: logDir + '/login',
+            filename: `%DATE%.login.log`,
             maxFile: 30,
             zippedArchive: true,
         }),
@@ -81,4 +108,4 @@ var morgan = require('morgan');
 var env = prop.getEnv() === 'production' ? 'combined' : 'dev';
 morgan = morgan(env, {stream});
 
-module.exports = morgan;
+module.exports = {morgan};

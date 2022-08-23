@@ -33,7 +33,7 @@ exports.signInUser = async (req, res, next) => {
 
         const token = userService.createToken(user._id); // user의 고유id로 토큰을 생성.
 
-        res.status(201).json({result: 'login success', token}).end(()=>{logger.info(`login success | ${user}`)});
+        res.status(201).json({result: 'login success', token}).end(()=>{logger.login(`login success | ${user.email}`)});
     }catch(err){
         next(err);
     }

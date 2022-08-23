@@ -2,7 +2,7 @@
 global.prop = require('./common/properties');
 
 const express = require('express');
-const morgan = require('./config/logger');      // logger
+const {morgan} = require('./config/logger');
 const router = require('./routes/indexRouter'); //routes
 const bodyparser = require('body-parser');
 
