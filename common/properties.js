@@ -10,3 +10,8 @@ exports.getEnv = () => {
     let env = properties.get('env.NODE_ENV');
     return env;
 }
+
+exports.getValue = (key) =>{
+    let value = properties.get(key);
+    return value;
+}

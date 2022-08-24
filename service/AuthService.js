@@ -4,10 +4,10 @@ const jwt = require('jsonwebtoken'); //jwt
 
 module.exports = (User) => { //function의 매개변수를이용한 의존성 주입.
 
-    const userService = {};
+    const authService = {};
     
     
-    userService.userWithEncodePassword = async ({email, password, name, birth, phon, reg_dt}) => {
+    authService.userWithEncodePassword = async ({email, password, name, birth, phon, reg_dt}) => {
     
         const hashedPassword = await bcrypt.hash(password, 12); //password 암호화
     
@@ -21,25 +21,30 @@ module.exports = (User) => { //function의 매개변수를이용한 의존성 �
     }
 
     // create User
-    userService.createUser = async (userInput) => {
-        const user = await userService.userWithEncodePassword(userInput);
+    authService.createUser = async (userInput) => {
+        const user = await authService.userWithEncodePassword(userInput);
         return user.save();
     }
 
     //userId token 생성
-    userService.createToken = (userId) => {
-        const token = jwt.sign({_id: userId.toString()}, bcrypt.genSalt().toString(), {expiresIn:'10m'});
+    authService.createToken = (userId) => {
+        const token = jwt.sign({_id: userId.toString()}, prop.getValue('auth.jwt.key'), {expiresIn:'10m'});
         return token;
     }
 
     //passwordCheck
-    userService.pwCheck = async(password, userPassword) => {
+    authService.pwCheck = async(password, userPassword) => {
         const check = await bcrypt.compare(password, userPassword);
         return check;
     }
     
 
 
-    return userService;
+    return authService;
 }
 
+// 토큰 검증.
+exports.tokenVerify = (token) => {
+    let decode = jwt.verify(token, prop.getValue('auth.jwt.key'));
+    return decode;
+}

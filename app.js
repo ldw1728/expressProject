@@ -1,6 +1,8 @@
 //global val
 global.prop = require('./common/properties');
 
+//onst {passport} = require('./config/passport');
+
 const express = require('express');
 const {morgan} = require('./config/logger');
 const router = require('./routes/indexRouter'); //routes
