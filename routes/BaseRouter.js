@@ -1,14 +1,14 @@
 const router = require('express').Router();
 
-router.all((req, res, next) => {
-    console.log('base');
-    next();
+router.all('/',(req, res, next) => {
+    console.log('index page');
+    res.redirect('/main');
 });
 
 
-router.get('/', function(req, res){
+router.get('/main', (req, res, next)=>{
     // console.log('homepage');
-     res.send('homepage');
+     res.send('main page');
  })
 
 

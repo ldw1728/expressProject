@@ -7,6 +7,7 @@ const express = require('express');
 const {morgan} = require('./config/logger');
 const router = require('./routes/indexRouter'); //routes
 const bodyparser = require('body-parser');
+const cookie = require('cookie-parser');
 
 
 const app = express();          // - def express app
@@ -16,6 +17,7 @@ app.use(morgan);
 //-- body-parser
 app.use(bodyparser.urlencoded({extended : true}));
 app.use(bodyparser.json());
+app.use(cookie());
 router(app);//set routes
 
 
