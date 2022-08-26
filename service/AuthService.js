@@ -17,8 +17,9 @@ module.exports = {
             phon
         });
     },
-    createUser: async (userInput) => {
-        const user = await authService.userWithEncodePassword(userInput);
+    
+    createUser: async function(userInput) {
+        const user = await this.userWithEncodePassword(userInput);
         return user.save();
     },
 
@@ -34,54 +35,96 @@ module.exports = {
         return check;
     },
 
-    tokenVerify : async(token, cb) => {
-        let decode = await jwt.verify(token, prop.getValue('auth.jwt.key'), (err, decoded)=>{
-            if(cb !== null && cb !== 'undefined'){ //콜백함수 존재시 실행.
-                if(err){
-                    cb(null, err);
+    //jwt 검증
+    tokenVerify : async function(token, cb = null) {
+        let result = {};
+        let resultFunc = cb !== null ? cb : (obj = null, err = null) =>{ result.obj = obj; result.err=err }; 
+        try{
+            await jwt.verify(token, prop.getValue('auth.jwt.key'), (err, decoded)=>{         
+                if(decoded){
+                    resultFunc(decoded, null);
                 }
                 else {
-                    decode = decoded;
-                    cb(decoded);
-                }
-                    
-                return;
-            }
-        });
-       
-        return decode;
+                    resultFunc(null, err);
+                }                  
+                return;         
+            });
+        }catch(err){
+            if(err.name === 'TokenExpiredError')
+            resultFunc(null, err);
+        }
+        return result;
+    },
+
+    // 로그인 이력
+    setSignInHst : async function(user){
+        user.last_dt = Date.now();
+        await user.save();
+        logger.login(`login success | ${user.email}`);
     },
     
+    //로그인
     signInUser : async function ({email, password}) {
         try{
-            var result = {};
-        const user = await User.findOne({email}); // email로 데이터조회
-        if(!user) result.error = new Error('user not found'); //유저없을 시 에러발생
+            var result = {
+                msg     : '',
+                code    : '',
+                error   : null
+            };
+            if(email && password){
+                const user = await User.findOne({email}); // email로 데이터조회
+                if(!user){//유저없을 시 에러발생
+                    result.msg      = 'user not found';
+                    result.code     = 'NOTFOUND';
+                }
 
-        const passwordCheck = await this.pwCheck(password, user.password); //password check
-        if(!passwordCheck) result.error = new Error("wrong password"); // password 다를 시 에러 발생.
+                const passwordCheck = await this.pwCheck(password, user.password); //password check
+                if(!passwordCheck){
+                    result.msg      = 'wrong password';
+                    result.code     = 'WRONGPW';
+                } // password 다를 시 에러 발생.
 
-        result.token = await this.createToken(user._id); // user의 고유id로 토큰을 생성.
-  
+                if(user && passwordCheck){
+                    result.user      = user;
+                    result.token    = await this.createToken(user._id); // user의 고유id로 토큰을 생성.
+                    result.msg      = 'signIn User';
+                    result.code     = 'SUCC';
+                }
+            }
+            else{
+                result.msg      = 'invaild input';
+                result.code     = 'INV';
+            }
+        
+            
         }catch(err){
-            result.error = err
+            result.error    = err
         }finally{
             return result;
         }
         
     },
-
-    signUpUser: async function({email}){
-        try{
-            const result = {};
-            const user = await User.findOne({email});
-        if(user){
-            result.error = new Error('duplicated email');
-            error.statusCode = 404;
+    // 회원가입
+    signUpUser: async function(reqUser){
+        let result = {
+            _id : null,
+            msg : '',
+            code : '',
+            error : null
+        };
+        try{     
+            const user = await User.findOne({email : reqUser.email});
+        if(user){            
+            result.msg      = 'duplicated email';
+            result.code     = 'DUP';
             return result;
         }
-        await this.createUser(req.body)
-            .then(user => result._id = user._id)
+        await this.createUser(reqUser)
+            .then(user => {
+                result._id      = user._id;
+                result.code     = 'SUCC';
+                result.msg      = 'created User';
+            })
             .catch(err => result.error = err); //유저 생성.
         }catch(err){
             result.error = err;

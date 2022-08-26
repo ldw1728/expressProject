@@ -2,36 +2,27 @@
 const authService = require('../service/AuthService');
 
 module.exports = (req, res, next) => {
-    req.tokenVerify = authService.tokenVerify;
-    try{
-        //jwt 검증. (사용자 토큰이 유효한지.)
-        authService.tokenVerify(req.cookies.token, (decode, err) => {
-            if(decode){
-                console.log('auth pass');
-                req.user = decode;
-                
-            }
-            else {
-                if(err && err.name === 'TokenExpiredError'){
-                    console.log('auth expire');
-                    //res.send('login page');
-                    if(isLoginReqPage(req.originalUrl)){
-                        res.send('login page');
-                        return;
-                    }
-                }         
-            }
-            next();
-        });
+    //req.tokenVerify = authService.tokenVerify;
+    try{    
+        const userToken = req.cookies.token;
         
-    }catch(err){
-        if(err.message == 'token is not defined'){ //토큰참조에러 시
-            console.log(req.cookies.token)
+        let result = {};
+
+        //jwt 검증. (사용자 토큰이 유효한지.)
+        result = authService.tokenVerify(userToken);
+
+        if(!result.obj){
+            //로그인 요구 페이지 확인.
             if(isLoginReqPage(req.originalUrl)){
-                res.send('login page'); 
-                return;              
+                res.send('login page');
+                return;
             }
+
+            if(result.err !== 'TokenExpiredError')
+            throw result.err;
         }
+        next();
+    }catch(err){
         next(err); 
     }
     

@@ -22,6 +22,10 @@ var User = new Schema({
         type : 'String',
         default : '0'
     },
+    last_dt : {
+        type : 'Date',
+        default : Date.now
+    },
     reg_dt : {
         type : 'Date',
         default : Date.now

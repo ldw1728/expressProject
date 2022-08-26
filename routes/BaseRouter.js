@@ -8,7 +8,9 @@ router.all('/',(req, res, next) => {
 
 router.get('/main', (req, res, next)=>{
     // console.log('homepage');
+    //console.log(JSON.stringify(req.user))
      res.send('main page');
+     
  })
 
 

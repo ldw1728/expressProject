@@ -1,4 +1,4 @@
 
 exports.getUser = (req, res, next) => {
-    res.send(req.user);
+    res.send(`this is userInfo page || ${JSON.stringify(req.user)}`);
 }
